@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluegace | Giriş & Kayıt</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Sayfaya özel arka plan ve overlay ayarları */
+        body {
+            background: url('/girisarkaplan.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Arka planı matlaştıran overlay */
+        .page-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 31, 34, 0.75); 
+            z-index: 1;
+        }
+
+        .auth-card {
+            position: relative;
+            z-index: 2;
+            background: var(--bg-darker); /* style.css'den gelir */
+        }
+
+        /* Google Butonu */
+        .google-btn {
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            color: #2e3338;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+        .google-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
+        .google-btn img { width: 18px; }
+
+        .divider {
+            display: flex; align-items: center; margin: 20px 0;
+            color: var(--text-muted); font-size: 12px; font-weight: 700;
+        }
+        .divider::before, .divider::after {
+            content: ""; flex: 1; height: 1px; background: var(--bg-light); margin: 0 10px;
+        }
+
+        .toggle-text { margin-top: 15px; font-size: 14px; color: var(--text-muted); text-align: center; }
+        .toggle-link { color: var(--blue-flat); cursor: pointer; font-weight: 600; }
+        .toggle-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="page-overlay"></div>
+
+    <div class="auth-card" id="login-box">
+        <h2>Tekrar Hoş Geldin!</h2>
+        <p>Seni tekrar gördüğümüz için çok mutluyuz.</p>
+        
+        <form action="/login" method="POST">
+            <label>E-POSTA</label>
+            <input type="email" name="email" required placeholder="E-posta adresini gir">
+            
+            <label>ŞİFRE</label>
+            <input type="password" name="password" required placeholder="Şifreni gir">
+            
+            <button type="submit" class="btn-primary">Giriş Yap</button>
+        </form>
+
+        <div class="toggle-text">
+            Hesabın yok mu? <span class="toggle-link" onclick="toggleAuth()">Kayıt Ol</span>
+        </div>
+
+        <div class="divider">VEYA</div>
+
+        <button type="button" onclick="window.location.href='/auth/google'" class="google-btn">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6Dt-mn7WpoqnoyioycXLnDQwMPzPbuPb9vw&s" alt="G">
+            Google ile Giriş Yap
+        </button>
+    </div>
+
+    <div class="auth-card" id="register-box" style="display: none;">
+        <h2>Hesap Oluştur</h2>
+        <p>Hemen Bluegace topluluğuna katıl.</p>
+        
+        <form action="/register" method="POST">
+            <label>E-POSTA</label>
+            <input type="email" name="email" required placeholder="E-posta adresini gir">
+            
+            <label>KULLANICI ADI</label>
+            <input type="text" name="username" required placeholder="Sana nasıl hitap edelim?">
+            
+            <label>ŞİFRE</label>
+            <input type="password" name="password" required placeholder="Güçlü bir şifre seç">
+            
+            <button type="submit" class="btn-primary">Devam Et</button>
+        </form>
+
+        <div class="toggle-text">
+            Zaten hesabın var mı? <span class="toggle-link" onclick="toggleAuth()">Giriş Yap</span>
+        </div>
+    </div>
+
+    <script>
+        function toggleAuth() {
+            const loginBox = document.getElementById('login-box');
+            const regBox = document.getElementById('register-box');
+            
+            if (loginBox.style.display === 'none') {
+                loginBox.style.display = 'block';
+                regBox.style.display = 'none';
+            } else {
+                loginBox.style.display = 'none';
+                regBox.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

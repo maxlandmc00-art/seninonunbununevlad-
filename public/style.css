@@ -1,0 +1,430 @@
+/* =========================================
+   BLUEGACE – FULL ENTEGRE TASARIM
+   (Tüm Özellikler Dahil - Glow & Depth)
+   ========================================= */
+
+/* --- 1. DEĞİŞKENLER VE TEMEL AYARLAR --- */
+:root {
+    --bg-darkest: #1e1f22;
+    --bg-darker: #2b2d31;
+    --bg-main: #313338;
+    --bg-light: #3a3c43;
+
+    --blue-accent: linear-gradient(135deg, #5865f2, #4752c4);
+    --blue-flat: #5865f2;
+    --green-status: #3ba55d;
+
+    --text-primary: #f2f3f5;
+    --text-muted: #b5bac1;
+
+    --card-radius: 12px;
+    --transition: 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* --- 2. GİRİŞ VE YÜKLENME EKRANI (LANDING) --- */
+.landing-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background:
+        radial-gradient(circle at top, rgba(88,101,242,0.15), transparent 60%),
+        radial-gradient(circle at bottom, rgba(0,0,0,0.6), transparent 60%),
+        var(--bg-darkest);
+}
+
+.rotating-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 25px;
+    animation: spin 2.5s infinite linear;
+    filter:
+        drop-shadow(0 0 15px rgba(88,101,242,0.6))
+        drop-shadow(0 0 40px rgba(88,101,242,0.25));
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* --- 3. KİMLİK DOĞRULAMA (AUTH CARD) --- */
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    background: rgba(43,45,49,0.85);
+    backdrop-filter: blur(10px);
+    border-radius: var(--card-radius);
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+.auth-card h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.auth-card p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.auth-card label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 18px;
+    background: rgba(30,31,34,0.9);
+    border: 1px solid #18191c;
+    border-radius: 5px;
+    color: white;
+    outline: none;
+    transition: var(--transition);
+}
+
+.auth-card input:focus {
+    border-color: var(--blue-flat);
+    box-shadow: 0 0 0 2px rgba(88,101,242,0.25);
+}
+
+/* --- 4. ANA DÜZEN (APP LAYOUT) --- */
+.app-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* --- 5. SUNUCU SİDEBARI (SERVER SIDEBAR) --- */
+.server-sidebar {
+    width: 72px;
+    background-color: var(--bg-darkest);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 10px;
+}
+
+.server-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    transition: var(--transition);
+    position: relative;
+}
+
+.server-icon::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    width: 4px;
+    height: 0;
+    background: var(--blue-flat);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.server-icon:hover,
+.server-icon.active {
+    border-radius: 16px;
+    background: var(--blue-flat);
+}
+
+.server-icon:hover::before,
+.server-icon.active::before {
+    height: 60%;
+}
+
+.server-icon.active {
+    box-shadow: 0 0 18px rgba(88,101,242,0.55);
+}
+
+/* --- 6. ARKADAŞLAR SİDEBARI (FRIENDS SIDEBAR) --- */
+.friends-sidebar {
+    width: 240px;
+    background-color: var(--bg-darker);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    height: 48px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+}
+
+.friends-list {
+    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: var(--transition);
+    justify-content: space-between;
+    position: relative;
+}
+
+.friend-item:hover {
+    background: linear-gradient(
+        90deg,
+        rgba(88,101,242,0.18),
+        transparent
+    );
+    color: var(--text-primary);
+}
+
+.friend-item.active {
+    background: rgba(88,101,242,0.25);
+    color: var(--text-primary);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--green-status);
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* DM KAPATMA BUTONU (X) */
+.close-dm { 
+    opacity: 0; 
+    color: var(--text-muted); 
+    font-size: 18px; 
+    transition: var(--transition); 
+    padding: 0 5px; 
+    line-height: 1; 
+}
+
+.friend-item:hover .close-dm { 
+    opacity: 1; 
+}
+
+.close-dm:hover { 
+    color: #f23f43 !important; 
+    transform: scale(1.2); 
+}
+
+/* --- 7. ÜST NAVİGASYON (TOP NAV) --- */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-main);
+}
+
+.top-nav { 
+    height: 48px; 
+    display: flex !important; 
+    align-items: center; 
+    padding: 0 16px; 
+    gap: 8px; 
+    border-bottom: 1px solid rgba(0,0,0,0.2); 
+    background: var(--bg-main);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.nav-item { 
+    padding: 4px 12px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    font-size: 14px; 
+    font-weight: 500;
+    transition: var(--transition); 
+}
+
+.nav-item:hover { 
+    background: rgba(255,255,255,0.05); 
+    color: var(--text-primary); 
+}
+
+.nav-item.active { 
+    background: rgba(88,101,242,0.2); 
+    color: white; 
+}
+
+.nav-item.add-friend { 
+    background: var(--green-status) !important; 
+    color: white !important; 
+}
+
+/* --- 8. SOHBET EKRANI (CHAT SCREEN) --- */
+#chat-screen { 
+    height: 100%; 
+    display: none; 
+    flex-direction: column; 
+    background: var(--bg-main); 
+}
+
+#chat-header { 
+    height: 48px; 
+    border-bottom: 1px solid rgba(0,0,0,0.2); 
+    padding: 0 16px; 
+    display: flex; 
+    align-items: center; 
+    font-weight: bold; 
+    color: white; 
+}
+
+#msg-list { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 20px; 
+}
+
+/* MESAJ YAZMA ALANI */
+#msg-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-light);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    transition: var(--transition);
+}
+
+#msg-input:focus {
+    box-shadow: 0 0 10px rgba(88,101,242,0.2);
+}
+
+/* YAZIYOR GÖSTERGESİ */
+.typing-indicator { 
+    color: var(--text-muted); 
+    font-size: 12px; 
+    font-style: italic; 
+    padding: 5px 20px; 
+    min-height: 22px; 
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* --- 9. DURUM SİDEBARI (STATUS SIDEBAR) --- */
+.status-sidebar {
+    width: 300px;
+    padding: 20px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), transparent),
+        var(--bg-darker);
+    border-left: 1px solid rgba(255,255,255,0.05);
+}
+
+.status-sidebar h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.activity-card {
+    background: var(--bg-darkest);
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        0 10px 25px rgba(0,0,0,0.4);
+}
+
+.activity-card strong {
+    color: var(--blue-flat);
+}
+
+/* --- 10. ÖZEL KARTLAR VE BARLAR --- */
+.already-card { 
+    text-align: center; 
+    padding: 40px; 
+    background: var(--bg-darkest); 
+    border-radius: var(--card-radius); 
+    margin: 40px; 
+    border: 1px solid var(--blue-flat);
+    box-shadow: 0 0 20px rgba(88,101,242,0.2);
+}
+
+.user-settings-bar {
+    height: 52px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    background: var(--bg-darkest);
+    gap: 8px;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--blue-accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(88,101,242,0.35);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(88,101,242,0.5);
+}
+
+/* --- 11. KAYDIRMA ÇUBUĞU (SCROLLBAR) --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #5865f2, #3b44a9);
+    border-radius: 10px;
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluegace | Sohbet</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Hızlıca buraya temel CSS ekleyelim (public/style.css de kullanabilirsin) */
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #36393f; color: #dcddde; }
+        #app { display: flex; height: 100vh; }
+        .sidebar { width: 260px; background-color: #2f3136; display: flex; flex-direction: column; }
+        .server-name { padding: 20px; font-weight: bold; border-bottom: 1px solid #26272b; color: white; }
+        .channels { padding: 15px; flex-grow: 1; }
+        .channel-item { padding: 8px; border-radius: 4px; cursor: pointer; margin-bottom: 2px; }
+        .channel-item:hover { background-color: #393c43; color: white; }
+        .chat-area { flex-grow: 1; display: flex; flex-direction: column; background-color: #36393f; }
+        #messages { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .message-box { display: flex; flex-direction: column; animation: fadeIn 0.3s ease; }
+        .msg-header { display: flex; align-items: baseline; gap: 10px; }
+        .username { color: #fff; font-weight: 600; }
+        .time { color: #72767d; font-size: 0.75rem; }
+        .text { color: #dcddde; margin-top: 4px; line-height: 1.4; }
+        #chat-form { padding: 20px; }
+        .input-wrapper { background-color: #40444b; border-radius: 8px; padding: 10px 15px; display: flex; }
+        #m { background: transparent; border: none; color: white; flex-grow: 1; outline: none; font-size: 1rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <aside class="sidebar">
+            <div class="server-name">BLUEGACE</div>
+            <div class="channels">
+                <div class="channel-item"># genel</div>
+                <div class="channel-item"># duyurular</div>
+                <div class="channel-item"># yardimlaşma</div>
+            </div>
+        </aside>
+
+        <main class="chat-area">
+            <div id="messages">
+                <% messages.forEach(function(msg) { %>
+                    <div class="message-box">
+                        <div class="msg-header">
+                            <span class="username"><%= msg.user %></span>
+                            <span class="time"><%= msg.time %></span>
+                        </div>
+                        <div class="text"><%= msg.text %></div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <form id="chat-form">
+                <div class="input-wrapper">
+                    <input id="m" autocomplete="off" placeholder="#genel kanalına mesaj gönder..." />
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('m');
+        const messageList = document.getElementById('messages');
+
+        // Sayfa açıldığında en aşağı kaydır
+        messageList.scrollTop = messageList.scrollHeight;
+
+        // Kullanıcı ismi simülasyonu (Şimdilik rastgele)
+        const myUsername = "User_" + Math.floor(Math.random() * 1000);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('new_message', {
+                    user: myUsername,
+                    text: input.value
+                });
+                input.value = '';
+            }
+        });
+
+        socket.on('chat_message', (msg) => {
+            const div = document.createElement('div');
+            div.className = 'message-box';
+            div.innerHTML = `
+                <div class="msg-header">
+                    <span class="username">${msg.user}</span>
+                    <span class="time">${msg.time}</span>
+                </div>
+                <div class="text">${msg.text}</div>
+            `;
+            messageList.appendChild(div);
+            messageList.scrollTop = messageList.scrollHeight;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluegace | Modern İletişim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-primary: #1e1f22;
+            --bg-secondary: #2b2d31;
+            --blue-flat: #5865f2;
+            --text-primary: #f2f3f5;
+            --text-muted: #b5bac1;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Hero Bölümü */
+        .hero-section {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
+        }
+
+        /* GIF Logosu İçin Alan */
+        .logo-wrapper {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .logo-wrapper img {
+            width: 100%;
+            height: auto;
+            /* Parlama efekti tamamen kaldırıldı */
+        }
+
+        h1 { font-size: 4rem; font-weight: 900; margin-bottom: 10px; }
+        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 1.2rem; }
+
+        .cta-button {
+            background: var(--blue-flat);
+            color: white; border: none;
+            padding: 16px 40px; border-radius: 5px;
+            font-weight: bold; cursor: pointer;
+            transition: 0.2s;
+        }
+        .cta-button:hover { background: #4752c4; }
+
+        /* Yükleme Ekranı (Overlay) */
+        .loader-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-primary);
+            display: none; /* Başlangıçta gizli */
+            flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .loader-overlay.active { display: flex; }
+
+        /* Özellikler */
+        .features { padding: 80px 20px; background: var(--bg-secondary); }
+        .grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: var(--bg-primary); padding: 30px; border-radius: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <section class="hero-section">
+            <div class="logo-wrapper">
+                <img src="/logo.gif" alt="Bluegace Logo">
+            </div>
+            <h1>BLUEGACE</h1>
+            <p class="subtitle">Sınırları zorlayan, mat ve hızlı bir sohbet deneyimi.</p>
+            <button class="cta-button" id="cta-button">Tarayıcıda Aç</button>
+            <div style="margin-top: 50px; color: var(--text-muted);">Aşağı Kaydır ↓</div>
+        </section>
+
+        <section class="features">
+            <div class="grid">
+                <div class="card"><h3>Hızlı</h3><p>Milisaniyelik gecikme.</p></div>
+                <div class="card"><h3>Mat</h3><p>Göz yormayan tasarım.</p></div>
+                <div class="card"><h3>Güvenli</h3><p>Uçtan uca koruma.</p></div>
+            </div>
+        </section>
+
+        <div class="loader-overlay" id="loader">
+            <div class="logo-wrapper">
+                <img src="/logo.gif" alt="Yükleniyor...">
+            </div>
+            <h2 style="letter-spacing: 5px;">BLUEGACE</h2>
+            <p style="color: var(--text-muted); margin-top: 10px;">Bağlantı kuruluyor...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('cta-button').addEventListener('click', function() {
+            // Loader'ı aktif et
+            document.getElementById('loader').classList.add('active');
+            
+            // 3 saniye sonra auth sayfasına git
+            setTimeout(() => {
+                window.location.href = '/auth';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

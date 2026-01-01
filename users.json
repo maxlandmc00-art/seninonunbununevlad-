@@ -1,0 +1,18 @@
+{
+    "users": [
+        {
+            "email": "morbiangelshorts@gmail.com",
+            "username": "maxland",
+            "password": "Doruk2012doruk",
+            "tag": "#6800",
+            "avatar": "/logo.gif"
+        },
+        {
+            "email": "admin2@gorkemcorap.com",
+            "username": "görkem",
+            "password": "123456",
+            "tag": "#8434",
+            "avatar": "/logo.gif"
+        }
+    ]
+}

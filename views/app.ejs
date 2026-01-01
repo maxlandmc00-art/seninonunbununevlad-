@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bluegace</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="app-layout">
+    <nav class="server-sidebar">
+        <div class="server-icon active">B</div>
+    </nav>
+
+    <aside class="friends-sidebar">
+        <div class="sidebar-header">Bluegace DM</div>
+        <div class="friends-list">
+            <% if (typeof friends !== 'undefined') { %>
+                <% friends.forEach(f => { %>
+                    <% if (!f.hidden) { %>
+                        <div class="friend-item" id="dm-<%= f.username %>" onclick="openChat('<%= f.username %>')">
+                            <div style="display:flex; align-items:center;">
+                                <div class="status-dot"></div>
+                                <span><%= f.username %></span>
+                            </div>
+                            <div class="close-dm" onclick="confirmCloseDM(event, '<%= f.username %>')">×</div>
+                        </div>
+                    <% } %>
+                <% }) %>
+            <% } %>
+        </div>
+        <div class="user-settings-bar">
+            <div class="server-icon" style="width:32px; height:32px; font-size:12px;"><%= user.username[0].toUpperCase() %></div>
+            <div style="flex:1; font-size:13px; font-weight:600; color:white;"><%= user.username %></div>
+            <a href="/logout" style="text-decoration:none; opacity:0.6;">🚪</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-nav" id="main-nav">
+            <div class="nav-item <%= activeTab === 'online' ? 'active' : '' %>" onclick="location.href='/app?tab=online'">Aktif</div>
+            <div class="nav-item <%= activeTab === 'all' ? 'active' : '' %>" onclick="location.href='/app?tab=all'">Tümü</div>
+            <div class="nav-item <%= activeTab === 'pending' ? 'active' : '' %>" onclick="location.href='/app?tab=pending'">Bekleyen</div>
+            <div class="nav-item add-friend" onclick="location.href='/app?tab=add'">Arkadaş Ekle</div>
+        </div>
+
+        <div id="content-screen" style="flex:1; overflow-y:auto;">
+            <% if(activeTab === 'add') { %>
+                <div style="padding:40px;">
+                    <h2 style="margin-bottom:10px;">Arkadaş Ekle</h2>
+                    <form action="/add-friend" method="POST" style="display:flex; gap:10px;">
+                        <input type="text" name="targetUser" placeholder="Kullanıcı adı girin" style="flex:1; padding:12px; background:var(--bg-darkest); border:1px solid #000; color:white; border-radius:4px;">
+                        <button type="submit" class="btn-primary" style="width:auto; padding:0 20px;">İstek Gönder</button>
+                    </form>
+                    <div id="already-box"></div>
+                </div>
+            <% } %>
+            
+            <% if(activeTab === 'pending') { %>
+                <div style="padding:20px;">
+                    <% pending.forEach(p => { %>
+                        <div class="activity-card" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <span><%= p.username %> (<%= p.sender === user.username ? 'Giden' : 'Gelen' %>)</span>
+                            <% if(p.sender !== user.username) { %>
+                                <form action="/accept-friend" method="POST"><input type="hidden" name="requestId" value="<%= p.id %>"><button class="btn-primary" style="padding:4px 12px; width:auto;">Kabul Et</button></form>
+                            <% } %>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+
+        <div id="chat-screen">
+            <div id="chat-header"></div>
+            <div id="msg-list"></div>
+            <div id="typing-indicator" class="typing-indicator"></div>
+            <div style="padding:20px;">
+                <input type="text" id="msg-input" placeholder="Mesaj gönder..." autocomplete="off">
+            </div>
+        </div>
+    </main>
+</nav>
+
+<script>
+    let chatUser = null;
+    let typingTimeout;
+
+    // URL Parametre Kontrolü
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('status') === 'already' && document.getElementById('already-box')) {
+        document.getElementById('already-box').innerHTML = `
+            <div class="already-card">
+                <h3>Bu Kişi İle Zaten Arkadaşsın?</h3>
+                <button class="btn-primary" style="margin-top:20px; width:auto; padding:10px 30px;" onclick="openChat('${params.get('target')}')">Sohbete Git</button>
+            </div>`;
+    }
+
+    async function confirmCloseDM(event, target) {
+        event.stopPropagation();
+        const el = document.getElementById('dm-' + target);
+        if(el) el.style.display = 'none';
+        await fetch('/api/close-dm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: target }) });
+    }
+
+    function openChat(name) {
+        chatUser = name;
+        document.getElementById('main-nav').style.setProperty('display', 'none', 'important');
+        document.getElementById('content-screen').style.display = 'none';
+        document.getElementById('chat-screen').style.display = 'flex';
+        
+        document.getElementById('chat-header').innerHTML = `
+            <div style="display:flex; align-items:center; width:100%;">
+                <span style="color:var(--text-muted); margin-right:8px;">@</span>
+                <span>${name}</span>
+                <div style="margin-left:auto; cursor:pointer;" onclick="closeChat()">×</div>
+            </div>`;
+        loadMsgs();
+    }
+
+    function closeChat() {
+        chatUser = null;
+        location.href = '/app?tab=online';
+    }
+
+    async function loadMsgs() {
+        if(!chatUser) return;
+        const res = await fetch(`/api/chat/${chatUser}`);
+        const msgs = await res.json();
+        const list = document.getElementById('msg-list');
+        list.innerHTML = msgs.map(m => `
+            <div style="margin-bottom:15px;">
+                <div style="display:flex; gap:8px; align-items:baseline;">
+                    <span style="font-weight:bold; color:white;">${m.sender}</span>
+                    <span style="color:var(--text-muted); font-size:11px;">${m.time}</span>
+                </div>
+                <div style="color:var(--text-primary);">${m.text}</div>
+            </div>`).join('');
+        list.scrollTop = list.scrollHeight;
+
+        const typeRes = await fetch(`/api/typing-status/${chatUser}`);
+        const typeData = await typeRes.json();
+        document.getElementById('typing-indicator').innerText = typeData.isTyping ? `${chatUser} yazıyor...` : '';
+    }
+
+    document.getElementById('msg-input').addEventListener('input', () => {
+        if(!chatUser) return;
+        fetch('/api/typing', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({target:chatUser, isTyping:true}) });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            fetch('/api/typing', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({target:chatUser, isTyping:false}) });
+        }, 2000);
+    });
+
+    document.getElementById('msg-input').addEventListener('keypress', async (e) => {
+        if(e.key === 'Enter' && e.target.value.trim() !== "") {
+            const val = e.target.value; e.target.value = "";
+            fetch('/api/typing', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({target:chatUser, isTyping:false}) });
+            await fetch('/api/send-message', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({target:chatUser, message:val}) });
+            loadMsgs();
+        }
+    });
+
+    setInterval(() => { if(chatUser) loadMsgs(); }, 2000);
+</script>
+</body>
+</html>
